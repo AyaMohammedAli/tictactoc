@@ -1,73 +1,85 @@
-s = input("Enter pattern as XXX___OO_ or any pattern have x , o and _in (0-9) \n") 
-ls = [s[0:3], s[3:6], s[6:9], s[0] + s[3] + s[6], s[1] + s[4] + s[7], s[2] + s[5] + s[8], s[0] + s[4] + s[8], s[6] + s[4] + s[2]]
+# Game board
+board = [[' ', ' ', ' '], 
+         [' ', ' ', ' '],
+         [' ', ' ', ' ']]
 
-print(f"""
----------
-| {s[0]} {s[1]} {s[2]} |
-| {s[3]} {s[4]} {s[5]} |
-| {s[6]} {s[7]} {s[8]} |
----------""")
-if ("XXX" in ls and "OOO" in ls) or abs(s.count("X") - s.count("O")) >= 2:
-    print("Impossible")
-elif "_" not in s and "XXX" not in ls and "OOO" not in ls:
-     print("Draw")
-elif "_" in s and "XXX" not in ls and "OOO" not in ls:
-    print("Game not finished")
-elif "XXX" in ls:
-    print("X wins")
-elif "OOO" in ls:
-     print("O wins") 
+# Print the game board
+def print_board(board):
+  for row in board:
+    print('| ' + ' | '.join(row) + ' |')
 
-#- s[0:3] - First row
-#- s[3:6] - Second row
-#- s[6:9] - Third row
-#- s[0] + s[3] + s[6] - First column
-#- s[1] + s[4] + s[7] - Second column
-#- s[2] + s[5] + s[8] - Third column
-#- s[0] + s[4] + s[8] - Main diagonal
-#- s[6] + s[4] + s[2] - Anti-diagonal
+# Handle player's move with input validation  
+def player_move(board, player):
+  
+  while True:
+    print(f"\n{player}'s turn!")
+    row = input("Enter row (0, 1, or 2): ")
+    col = input("Enter column (0, 1, or 2): ")
+    
+    if row.isdigit() and col.isdigit():
+      row = int(row)
+      col = int(col)
+      
+      if row >= 0 and row < 3 and col >= 0 and col < 3:
+        if board[row][col] == ' ':
+          board[row][col] = player
+          break
+        else:
+          print("That space is already occupied!") 
+      else:
+        print("Invalid input. Please enter a value between 0 and 2.")
+    else:
+      print("Invalid input. Please enter a valid number.")
+      
+# Check for winner  
+def check_win(board, player):
+  # Check rows
+  for row in board:
+    if len(set(row)) == 1 and row[0] == player:
+      return True
 
+  # Check columns
+  for i in range(len(board)):
+    col = [row[i] for row in board]
+    if len(set(col)) == 1 and col[0] == player:
+      return True
 
-# Input: 
-# XXXOOOO__
+  # Check diagonals
+  diag1 = [board[i][i] for i in range(len(board))]
+  diag2 = [board[i][len(board)-1-i] for i in range(len(board))]
+  if len(set(diag1)) == 1 and diag1[0] == player:
+    return True
+  if len(set(diag2)) == 1 and diag2[0] == player:
+    return True
 
-# Output:
-# --------- 
-# | X X X |
-# | O O O |
-# | _ _ _ |
-# ---------
-# Impossible
+  return False
 
-# Input:  
-# XO_X__O_O
+# Check for tie
+def check_tie(board):
+  for row in board:
+    if ' ' in row:
+      return False
+  
+  return True
 
-# Output:
-# ---------
-# | X O _ |  
-# | X _ _ |
-# | O _ O |
-# ---------
-# Game not finished
+# Main game loop  
+player = 'X'
+while True:
 
-# Input:
-# XXX___OO_
-
-# Output: 
-# ---------
-# | X X X |
-# | _ _ _ |
-# | _ _ O O |  
-# ---------
-# X wins
-
-# Input:
-# _O_OXX_X_
-
-# Output: 
-# ---------
-# | _ O _ |
-# | O X X |
-# | _ X _ |
-# ---------
-# O wins
+  print_board(board)
+  
+  player_move(board, player)
+  
+  if check_win(board, player):
+    print(f"\n{player} wins!")
+    break
+  
+  if check_tie(board):
+    print("\nIt's a tie!")
+    break
+    
+  # Switch player
+  if player == 'X':
+    player = 'O'
+  else:
+    player = 'X'
